@@ -1,0 +1,79 @@
+name: 'release-please-action'
+description: 'automated releases based on conventional commits'
+author: step-security
+inputs:
+  token:
+    description: 'GitHub token for creating and grooming release PRs, defaults to using secrets.GITHUB_TOKEN'
+    required: false
+    default: ${{ github.token }}
+  release-type:
+    description: 'what type of release is this, one of (ruby, python, node, terraform-module)'
+    required: false
+    default: ''
+  path:
+    description: "create a release from a path other than the repository's root"
+    required: false
+    default: ''
+  target-branch:
+    description: branch to open pull release PR against (detected by default)
+    required: false
+    default: ''
+  config-file:
+    description: 'where can the config file be found in the project?'
+    required: false
+    default: ''
+  manifest-file:
+    description: 'where can the manifest file be found in the project?'
+    required: false
+    default: ''
+  repo-url:
+    description: 'configure github repository URL. Default `process.env.GITHUB_REPOSITORY`'
+    required: false
+    default: ${{ github.repository }}
+  github-api-url:
+    description: 'configure github API URL. Default `https://api.github.com`'
+    required: false
+    default: ${{ github.api_url }}
+  github-graphql-url:
+    description: 'configure github GraphQL URL. Default `https://api.github.com`'
+    required: false
+    default: ${{ github.graphql_url }}
+  fork:
+    description: 'If true, send the PR from a fork. This requires the token to be a user that can create forks (e.g. not the default GITHUB_TOKEN)'
+    required: false
+    default: false
+  include-component-in-tag:
+    description: 'If true, add prefix to tags and branches, allowing multiple libraries to be released from the same repository'
+    required: false
+    default: false
+  proxy-server:
+    description: 'set proxy sever when you run this action behind a proxy. format is host:port e.g. proxy-host.com:8080'
+    required: false
+    default: ''
+  skip-github-release:
+    description: 'if set to true, then do not try to tag releases'
+    required: false
+    default: false
+  skip-github-pull-request:
+    description: 'if set to true, then do not try to open pull requests'
+    required: false
+    default: false
+  skip-labeling:
+    description: 'if set to true, then do not try to label the PR'
+    required: false
+    default: false
+  changelog-host:
+    description: 'The proto://host where commits live. Default `https://github.com`'
+    required: false
+    default: ${{ github.server_url }}
+  versioning-strategy:
+    description: 'The versioning strategy to use.'
+    required: false
+    default: 'default'
+  release-as:
+    description: 'The version to release as.'
+    required: false
+    default: ''
+runs:
+  using: 'node24'
+  main: 'dist/index.js'
