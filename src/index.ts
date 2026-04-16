@@ -16,7 +16,13 @@
 import * as core from '@actions/core';
 import * as fs from 'fs';
 import axios, {isAxiosError} from 'axios';
-import {GitHub, Manifest, CreatedRelease, PullRequest, VERSION} from 'release-please';
+import {
+  GitHub,
+  Manifest,
+  CreatedRelease,
+  PullRequest,
+  VERSION,
+} from 'release-please';
 
 const DEFAULT_CONFIG_FILE = 'release-please-config.json';
 const DEFAULT_MANIFEST_FILE = '.release-please-manifest.json';
@@ -111,12 +117,13 @@ function loadOrBuildManifest(
       inputs.path
     );
   }
-  const manifestOverrides = inputs.fork || inputs.skipLabeling
-    ? {
-        fork: inputs.fork,
-        skipLabeling: inputs.skipLabeling,
-      }
-    : {};
+  const manifestOverrides =
+    inputs.fork || inputs.skipLabeling
+      ? {
+          fork: inputs.fork,
+          skipLabeling: inputs.skipLabeling,
+        }
+      : {};
   core.debug('Loading manifest from config file');
   return Manifest.fromManifest(
     github,
@@ -126,7 +133,10 @@ function loadOrBuildManifest(
     manifestOverrides
   ).then(manifest => {
     // Override changelogHost for all paths if provided as action input and different from default
-    if (inputs.changelogHost && inputs.changelogHost !== DEFAULT_GITHUB_SERVER_URL) {
+    if (
+      inputs.changelogHost &&
+      inputs.changelogHost !== DEFAULT_GITHUB_SERVER_URL
+    ) {
       core.debug(`Overriding changelogHost to: ${inputs.changelogHost}`);
       for (const path in manifest.repositoryConfig) {
         manifest.repositoryConfig[path].changelogHost = inputs.changelogHost;
@@ -137,48 +147,56 @@ function loadOrBuildManifest(
 }
 
 async function validateSubscription() {
-  const eventPath = process.env.GITHUB_EVENT_PATH
-  let repoPrivate: boolean | undefined
+  const eventPath = process.env.GITHUB_EVENT_PATH;
+  let repoPrivate: boolean | undefined;
 
   if (eventPath && fs.existsSync(eventPath)) {
-    const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'))
-    repoPrivate = eventData?.repository?.private
+    const eventData = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+    repoPrivate = eventData?.repository?.private;
   }
 
   const upstream = 'googleapis/release-please-action';
   const action = process.env.GITHUB_ACTION_REPOSITORY;
-  const docsUrl = 'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
+  const docsUrl =
+    'https://docs.stepsecurity.io/actions/stepsecurity-maintained-actions';
 
   core.info('');
   core.info('\u001b[1;36mStepSecurity Maintained Action\u001b[0m');
   core.info(`Secure drop-in replacement for ${upstream}`);
-  if (repoPrivate === false) core.info('\u001b[32m\u2713 Free for public repositories\u001b[0m');
+  if (repoPrivate === false)
+    core.info('\u001b[32m\u2713 Free for public repositories\u001b[0m');
   core.info(`\u001b[36mLearn more:\u001b[0m ${docsUrl}`);
   core.info('');
 
   if (repoPrivate === false) return;
 
   const serverUrl = process.env.GITHUB_SERVER_URL || 'https://github.com';
-  const body: Record<string, string> = { action: action || '' };
+  const body: Record<string, string> = {action: action || ''};
   if (serverUrl !== 'https://github.com') body.ghes_server = serverUrl;
   try {
     await axios.post(
       `https://agent.api.stepsecurity.io/v1/github/${process.env.GITHUB_REPOSITORY}/actions/maintained-actions-subscription`,
-      body, { timeout: 3000 }
+      body,
+      {timeout: 3000}
     );
   } catch (error) {
     if (isAxiosError(error) && error.response?.status === 403) {
-      core.error(`\u001b[1;31mThis action requires a StepSecurity subscription for private repositories.\u001b[0m`);
-      core.error(`\u001b[31mLearn how to enable a subscription: ${docsUrl}\u001b[0m`);
-      process.exit(1);
+      core.error(
+        '\u001b[1;31mThis action requires a StepSecurity subscription for private repositories.\u001b[0m'
+      );
+      core.error(
+        `\u001b[31mLearn how to enable a subscription: ${docsUrl}\u001b[0m`
+      );
+      process.exit(1); // eslint-disable-line n/no-process-exit
     }
     core.info('Timeout or API not reachable. Continuing to next step.');
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function main(fetchOverride?: any) {
   await validateSubscription();
-  core.info(`Running release-please version: ${VERSION}`)
+  core.info(`Running release-please version: ${VERSION}`);
   const inputs = parseInputs();
   const github = await getGitHubInstance(inputs, fetchOverride);
 
@@ -195,7 +213,11 @@ export async function main(fetchOverride?: any) {
   }
 }
 
-function getGitHubInstance(inputs: ActionInputs, fetchOverride?: any): Promise<GitHub> {
+function getGitHubInstance(
+  inputs: ActionInputs,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  fetchOverride?: any
+): Promise<GitHub> {
   const [owner, repo] = inputs.repoUrl.split('/');
   let proxy: Proxy | undefined = undefined;
   if (inputs.proxyServer) {
@@ -271,6 +293,6 @@ function outputPRs(prs: (PullRequest | undefined)[]) {
 
 if (require.main === module) {
   main().catch(err => {
-    core.setFailed(`release-please failed: ${err.message}`)
-  })
+    core.setFailed(`release-please failed: ${err.message}`);
+  });
 }

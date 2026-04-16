@@ -149,12 +149,12 @@ describe('release-please-action', () => {
           'dev',
           sinon.match.object,
           sinon.match.object,
-          sinon.match.any,
+          sinon.match.any
         );
       });
       it('allows specifying fork', async () => {
         restoreEnv = mockInputs({
-          'fork': 'true',
+          fork: 'true',
           'release-type': 'simple',
         });
         fakeManifest.createReleases.resolves([]);
@@ -169,7 +169,7 @@ describe('release-please-action', () => {
           sinon.match.string,
           sinon.match.object,
           sinon.match({fork: true}),
-          sinon.match.any,
+          sinon.match.any
         );
       });
       it('allows specifying versioning-strategy', async () => {
@@ -192,7 +192,7 @@ describe('release-please-action', () => {
             versioning: 'default',
           }),
           sinon.match.object,
-          sinon.match.any,
+          sinon.match.any
         );
       });
 
@@ -216,7 +216,7 @@ describe('release-please-action', () => {
             releaseAs: '2.0.0',
           }),
           sinon.match.object,
-          sinon.match.any,
+          sinon.match.any
         );
       });
     });
@@ -275,7 +275,7 @@ describe('release-please-action', () => {
       });
       it('allows specifying fork', async () => {
         restoreEnv = mockInputs({
-          'fork': 'true',
+          fork: 'true',
         });
         fakeManifest.createReleases.resolves([]);
         fakeManifest.createPullRequests.resolves([]);
@@ -289,7 +289,7 @@ describe('release-please-action', () => {
           sinon.match.string,
           sinon.match.string,
           sinon.match.string,
-          sinon.match({fork: true}),
+          sinon.match({fork: true})
         );
       });
       it('allows specifying changelog-host', async () => {
@@ -312,7 +312,7 @@ describe('release-please-action', () => {
           sinon.match.string,
           sinon.match.string,
           sinon.match.string,
-          sinon.match(arg => !arg.hasOwnProperty('changelogHost')),
+          sinon.match(arg => !arg.hasOwnProperty('changelogHost')) // eslint-disable-line no-prototype-builtins
         );
       });
       it('modifies repositoryConfig with custom changelog-host', async () => {
@@ -322,14 +322,14 @@ describe('release-please-action', () => {
 
         // Create a mock repositoryConfig on the existing fakeManifest
         const mockRepositoryConfig = {
-          '.': { releaseType: 'node' },
-          'packages/foo': { releaseType: 'node' }
+          '.': {releaseType: 'node'},
+          'packages/foo': {releaseType: 'node'},
         };
         // Use Object.defineProperty to set the readonly property
         Object.defineProperty(fakeManifest, 'repositoryConfig', {
           value: mockRepositoryConfig,
           writable: true,
-          configurable: true
+          configurable: true,
         });
         fakeManifest.createReleases.resolves([]);
         fakeManifest.createPullRequests.resolves([]);
@@ -337,8 +337,14 @@ describe('release-please-action', () => {
         await action.main(fetch);
 
         // Verify that changelogHost was added to all paths in repositoryConfig
-        assert.strictEqual(fakeManifest.repositoryConfig['.'].changelogHost, 'https://ghe.example.com');
-        assert.strictEqual(fakeManifest.repositoryConfig['packages/foo'].changelogHost, 'https://ghe.example.com');
+        assert.strictEqual(
+          fakeManifest.repositoryConfig['.'].changelogHost,
+          'https://ghe.example.com'
+        );
+        assert.strictEqual(
+          fakeManifest.repositoryConfig['packages/foo'].changelogHost,
+          'https://ghe.example.com'
+        );
       });
       it('does not modify repositoryConfig when changelog-host is default', async () => {
         restoreEnv = mockInputs({
@@ -347,14 +353,14 @@ describe('release-please-action', () => {
 
         // Create a mock repositoryConfig on the existing fakeManifest
         const mockRepositoryConfig = {
-          '.': { releaseType: 'node' },
-          'packages/foo': { releaseType: 'node' }
+          '.': {releaseType: 'node'},
+          'packages/foo': {releaseType: 'node'},
         };
         // Use Object.defineProperty to set the readonly property
         Object.defineProperty(fakeManifest, 'repositoryConfig', {
           value: mockRepositoryConfig,
           writable: true,
-          configurable: true
+          configurable: true,
         });
         fakeManifest.createReleases.resolves([]);
         fakeManifest.createPullRequests.resolves([]);
@@ -362,8 +368,14 @@ describe('release-please-action', () => {
         await action.main(fetch);
 
         // Verify that changelogHost was NOT added when using default value
-        assert.strictEqual(fakeManifest.repositoryConfig['.'].changelogHost, undefined);
-        assert.strictEqual(fakeManifest.repositoryConfig['packages/foo'].changelogHost, undefined);
+        assert.strictEqual(
+          fakeManifest.repositoryConfig['.'].changelogHost,
+          undefined
+        );
+        assert.strictEqual(
+          fakeManifest.repositoryConfig['packages/foo'].changelogHost,
+          undefined
+        );
       });
     });
 
