@@ -1,0 +1,15 @@
+[[IgnoredVulns]]
+id = "GHSA-73rr-hh4g-fpgx"
+reason = "dev-only dependency (diff), not included in bundled action code"
+
+[[IgnoredVulns]]
+id = "GHSA-5c6j-r48x-rmvq"
+reason = "dev-only dependency (serialize-javascript), not included in bundled action code"
+
+[[IgnoredVulns]]
+id = "GHSA-qj8w-gfj5-8c6v"
+reason = "dev-only dependency (serialize-javascript), not included in bundled action code"
+
+[[IgnoredVulns]]
+id = "GHSA-52f5-9888-hmc6"
+reason = "dev-only dependency (tmp), not included in bundled action code"
