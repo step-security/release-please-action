@@ -13,6 +13,8 @@
 // limitations under the License.
 
 import * as core from '@actions/core';
+import * as fs from 'fs';
+import axios, {isAxiosError} from 'axios';
 import {GitHub, Manifest, CreatedRelease, PullRequest, VERSION} from 'release-please';
 
 const DEFAULT_CONFIG_FILE = 'release-please-config.json';
@@ -133,7 +135,7 @@ function loadOrBuildManifest(
   });
 }
 
-export async function validateSubscription() {
+async function validateSubscription() {
   const eventPath = process.env.GITHUB_EVENT_PATH;
   let repoPrivate: boolean | undefined;
 
@@ -180,7 +182,7 @@ export async function validateSubscription() {
   }
 }
 
-async function main(fetchOverride?: any) {
+export async function main(fetchOverride?: any) {
   await validateSubscription();
   core.info(`Running release-please version: ${VERSION}`)
   const inputs = parseInputs();

@@ -4,13 +4,15 @@
     "allowSyntheticDefaultImports": true,
     "rootDir": ".",
     "outDir": "build",
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "skipLibCheck": true
   },
   "include": [
-    "src/*.ts",
-    "src/**/*.ts",
-    "test/*.ts",
-    "test/**/*.ts",
-    "system-test/*.ts"
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "test",
+    "**/*.test.ts"
   ]
 }
