@@ -2,6 +2,10 @@
 
 # Release Please Action
 
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
+Automate releases with Conventional Commit Messages.
+
 ## Basic Configuration
 
 1. Create a `.github/workflows/release-please.yml` file with these contents:
@@ -296,13 +300,13 @@ jobs:
         with:
           release-type: node
       # The logic below handles the npm publication:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         # these if statements ensure that a publication only occurs when
         # a new release is created:
         if: ${{ steps.release.outputs.release_created }}
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 12
           registry-url: 'https://registry.npmjs.org'
         if: ${{ steps.release.outputs.release_created }}
       - run: npm ci
@@ -342,7 +346,7 @@ jobs:
         id: release
         with:
           release-type: node
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
       - name: tag major and minor versions
         if: ${{ steps.release.outputs.release_created }}
         run: |
@@ -385,6 +389,75 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh release upload ${{ steps.release.outputs.tag_name }} ./artifact/some-build-artifact.zip
 ```
+
+## Upgrading from v3 to v4
+
+### Command
+
+If you were setting the `command` option, you will likely need to modify your configuration.
+
+| Command          | New Configuration                                                | Description                                                                                                                                  |
+| ---------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `github-release` | `skip-github-pull-request: true`                                 | This command was used for only tagging releases. Now we tell release-please to skip opening release PRs.                                      |
+| `release-pr`     | `skip-github-release: true`                                      | This command was used for only opening release PRs. Now we tell release-please to skip tagging releases.                                     |
+| `manifest`       | do not set `release-type` option                                 | This command told release-please to use a manifest config file. This is now the default behavior unless you explicitly set a `release-type`. |
+| `manifest-pr`    | `skip-github-release: true` and do not set `release-type` option | This command told release-please to use a manifest config file and only open the pull request.                                               |
+
+### Package options
+
+If you were previously configuring advanced options via GitHub action inputs, you
+will need to configure via the release-please manifest configuration instead. Below,
+you can see a mapping of the old option to the new option:
+
+| Old Option                         | New Option                                                                            | Notes                                                                               |
+| ---------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| `path`                             | `$.packages`                                                                          | The root `packages` field is an object where the key is the `path` being configured |
+| `changelog-path`                   | `$.packages[path].changelog-path`                                                     | Package-only option                                                                 |
+| `component`                        | `$.packages[path].component`                                                          | Package-only option                                                                 |
+| `package-name`                     | `$.packages[path].package-name`                                                       | Package-only option                                                                 |
+| `always-link-local`                | `$.always-link-local`                                                                 | Root-only option                                                                    |
+| `always-update`                    | `$.always-update`                                                                     | Root-only option                                                                    |
+| `bootstrap-sha`                    | `$.bootstrap-sha`                                                                     | Root-only option                                                                    |
+| `commit-search-depth`              | `$.commit-search-depth`                                                               | Root-only option                                                                    |
+| `group-pull-request-title-pattern` | `$.group-pull-request-title-pattern`                                                  | Root-only option                                                                    |
+| `last-release-sha`                 | `$.last-release-sha`                                                                  | Root-only option                                                                    |
+| `plugins`                          | `$.plugins`                                                                           | Root-only option                                                                    |
+| `release-search-depth`             | `$.release-search-depth`                                                              | Root-only option                                                                    |
+| `sequential-calls`                 | `$.sequential-calls`                                                                  | Root-only option                                                                    |
+| `skip-labeling`                    | `$.skip-labeling`                                                                     | Root-only option                                                                    |
+| `signoff`                          | `$.signoff`                                                                           | Root-only option                                                                    |
+| `bump-minor-pre-major`             | `$.bump-minor-pre-major` or `$.packages[path].bump-minor-pre-major`                   | Root or per-package option                                                          |
+| `bump-patch-for-minor-pre-major`   | `$.bump-path-for-minor-pre-major` or `$.packages[path].bump-path-for-minor-pre-major` | Root or per-package option                                                          |
+| `changelog-host`                   | `$.changelog-host` or `$.packages[path].changelog-host`                               | Root or per-package option                                                          |
+| `changelog-notes-type`             | `$.changelog-type` or `$.packages[path].changelog-type`                               | Root or per-package option                                                          |
+| `changelog-types`                  | `$.changelog-sections` or `$.packages[path].changelog-sections`                       | Root or per-package option                                                          |
+| `component-no-space`               | `$.component-no-space` or `$.packages[path].component-no-space`                       | Root or per-package option                                                          |
+| `date-format`                      | `$.date-format` or `$.packages[path].date-format`                                     | Root or per-package option                                                          |
+| `draft`                            | `$.draft` or `$.packages[path].draft`                                                 | Root or per-package option                                                          |
+| `draft-pull-request`               | `$.draft-pull-request` or `$.packages[path].draft-pull-request`                       | Root or per-package option                                                          |
+| `exclude-paths`                    | `$.exclude-paths` or `$.packages[path].exclude-paths`                                 | Root or per-package option                                                          |
+| `extra-files`                      | `$.extra-files` or `$.packages[path].extra-files`                                     | Root or per-package option                                                          |
+| `extra-labels`                     | `$.extra-labels` or `$.packages[path].extra-labels`                                   | Root or per-package option                                                          |
+| `include-v-in-tag`                 | `$.include-v-in-tag` or `$.packages[path].include-v-in-tag`                           | Root or per-package option                                                          |
+| `initial-version`                  | `$.initial-version` or `$.packages[path].initial-version`                             | Root or per-package option                                                          |
+| `labels`                           | `$.label` or `$.packages[path].label`                                                 | Root or per-package option                                                          |
+| `monorepo-tags`                    | `$.include-component-in-tag` or `$.packages[path].include-component-in-tag`           | Root or per-package option                                                          |
+| `prerelease`                       | `$.prerelease` or `$.packages[path].prerelease`                                       | Root or per-package option                                                          |
+| `prerelease-type`                  | `$.prerelease-type` or `$.packages[path].prerelease-type`                             | Root or per-package option                                                          |
+| `pull-request-footer`              | `$.pull-request-footer` or `$.packages[path].pull-request-footer`                     | Root or per-package option                                                          |
+| `pull-request-header`              | `$.pull-request-header` or `$.packages[path].pull-request-header`                     | Root or per-package option                                                          |
+| `pull-request-title-pattern`       | `$.pull-request-title-pattern` or `$.packages[path].pull-request-title-pattern`       | Root or per-package option                                                          |
+| `release-as`                       | `$.release-as` or `$.packages[path].release-as`                                       | Root or per-package option                                                          |
+| `release-labels`                   | `$.release-label` or `$.packages[path].release-label`                                 | Root or per-package option                                                          |
+| `release-type`                     | `$.release-type` or `$.packages[path].release-type`                                   | Root or per-package option                                                          |
+| `separate-pull-requests`           | `$.separate-pull-requests` or `$.packages[path].separate-pull-requests`               | Root or per-package option                                                          |
+| `skip-changelog`                   | `$.skip-changelog` or `$.packages[path].skip-changelog`                               | Root or per-package option                                                          |
+| `skip-github-release`              | `$.skip-github-release` or `$.packages[path].skip-github-release`                     | Root or per-package option                                                          |
+| `skip-snapshot`                    | `$.skip-snapshot` or `$.packages[path].skip-snapshot`                                 | Root or per-package option                                                          |
+| `snapshot-labels`                  | `$.snapshot-label` or `$.packages[path].snapshot-label`                               | Root or per-package option                                                          |
+| `tag-separator`                    | `$.tag-separator` or `$.packages[path].tag-separator`                                 | Root or per-package option                                                          |
+| `version-file`                     | `$.version-file` or `$.packages[path].version-file`                                   | Root or per-package option                                                          |
+| `versioning-strategy`              | `$.versioning-strategy` or `$.packages[path].versioning-strategy`                     | Root or per-package option                                                          |
 
 ## License
 

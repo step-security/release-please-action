@@ -1,5 +1,4 @@
 // Copyright 2023 Google LLC
-// Copyright 2026 StepSecurity
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,15 +13,7 @@
 // limitations under the License.
 
 import * as core from '@actions/core';
-import * as fs from 'fs';
-import axios, {isAxiosError} from 'axios';
-import {
-  GitHub,
-  Manifest,
-  CreatedRelease,
-  PullRequest,
-  VERSION,
-} from 'release-please';
+import {GitHub, Manifest, CreatedRelease, PullRequest, VERSION} from 'release-please';
 
 const DEFAULT_CONFIG_FILE = 'release-please-config.json';
 const DEFAULT_MANIFEST_FILE = '.release-please-manifest.json';
@@ -117,13 +108,12 @@ function loadOrBuildManifest(
       inputs.path
     );
   }
-  const manifestOverrides =
-    inputs.fork || inputs.skipLabeling
-      ? {
-          fork: inputs.fork,
-          skipLabeling: inputs.skipLabeling,
-        }
-      : {};
+  const manifestOverrides = inputs.fork || inputs.skipLabeling
+    ? {
+        fork: inputs.fork,
+        skipLabeling: inputs.skipLabeling,
+      }
+    : {};
   core.debug('Loading manifest from config file');
   return Manifest.fromManifest(
     github,
@@ -133,10 +123,7 @@ function loadOrBuildManifest(
     manifestOverrides
   ).then(manifest => {
     // Override changelogHost for all paths if provided as action input and different from default
-    if (
-      inputs.changelogHost &&
-      inputs.changelogHost !== DEFAULT_GITHUB_SERVER_URL
-    ) {
+    if (inputs.changelogHost && inputs.changelogHost !== DEFAULT_GITHUB_SERVER_URL) {
       core.debug(`Overriding changelogHost to: ${inputs.changelogHost}`);
       for (const path in manifest.repositoryConfig) {
         manifest.repositoryConfig[path].changelogHost = inputs.changelogHost;
@@ -146,7 +133,7 @@ function loadOrBuildManifest(
   });
 }
 
-async function validateSubscription() {
+export async function validateSubscription() {
   const eventPath = process.env.GITHUB_EVENT_PATH;
   let repoPrivate: boolean | undefined;
 
@@ -193,10 +180,9 @@ async function validateSubscription() {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function main(fetchOverride?: any) {
+async function main(fetchOverride?: any) {
   await validateSubscription();
-  core.info(`Running release-please version: ${VERSION}`);
+  core.info(`Running release-please version: ${VERSION}`)
   const inputs = parseInputs();
   const github = await getGitHubInstance(inputs, fetchOverride);
 
@@ -213,11 +199,7 @@ export async function main(fetchOverride?: any) {
   }
 }
 
-function getGitHubInstance(
-  inputs: ActionInputs,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  fetchOverride?: any
-): Promise<GitHub> {
+function getGitHubInstance(inputs: ActionInputs, fetchOverride?: any): Promise<GitHub> {
   const [owner, repo] = inputs.repoUrl.split('/');
   let proxy: Proxy | undefined = undefined;
   if (inputs.proxyServer) {
@@ -293,6 +275,6 @@ function outputPRs(prs: (PullRequest | undefined)[]) {
 
 if (require.main === module) {
   main().catch(err => {
-    core.setFailed(`release-please failed: ${err.message}`);
-  });
+    core.setFailed(`release-please failed: ${err.message}`)
+  })
 }
